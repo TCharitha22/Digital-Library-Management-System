@@ -1,0 +1,1531 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>MBU Digital Library</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --purple: #7047d1;
+      --navy: #171b35;
+      --purple-light: #f1edff;
+      --purple-border: #d9cffb;
+      --ink: #20243a;
+      --muted: #696b82;
+      --line: #e1def0;
+      --white: #fff;
+      --shadow: 0 12px 32px rgba(24, 25, 58, .1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f7f6fc;
+      color: var(--ink);
+      font: 15px/1.55 "Segoe UI", Arial, sans-serif;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { min-height: 100vh; display: grid; grid-template-columns: 258px minmax(0, 1fr); }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 22px 15px;
+      overflow-y: auto;
+      color: #fff;
+      background: linear-gradient(170deg, #101629, #202244 75%, #49318a);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 2px 9px 22px; }
+    .brand-mark {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 1px solid #ffffff65;
+      border-radius: 14px;
+      background: #ffffff1c;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+    .brand strong, .brand small { display: block; }
+    .brand strong { font-size: 15px; }
+    .brand small { color: #d9d5f2; font-size: 12px; }
+    .nav-label { padding: 12px 12px 7px; color: #bcb5e8; font-size: 10px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    .nav-list { display: grid; gap: 4px; }
+    .nav-button {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 10px;
+      color: #eeecfa;
+      background: transparent;
+      text-align: left;
+    }
+    .nav-button:hover, .nav-button.active { color: #fff; background: #ffffff24; }
+    .nav-icon { width: 21px; text-align: center; font-size: 17px; }
+    .sidebar-note { margin: auto 5px 0; padding: 13px; border: 1px solid #ffffff30; border-radius: 12px; color: #d9d5f2; font-size: 12px; }
+    .main { min-width: 0; }
+    .topbar {
+      position: sticky;
+      z-index: 2;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 78px;
+      padding: 13px clamp(18px, 4vw, 48px);
+      border-bottom: 1px solid var(--line);
+      background: #f7f6fcf2;
+      backdrop-filter: blur(12px);
+    }
+    .topbar h1 { margin: 0; color: var(--navy); font-size: clamp(18px, 2vw, 23px); }
+    .topbar-tools { display: flex; align-items: center; gap: 13px; }
+    .topbar-brand { display: flex; min-width: 0; align-items: center; gap: 10px; }
+    .topbar-brand img { width: 42px; height: 42px; object-fit: contain; }
+    .topbar-brand strong, .topbar-brand small { display: block; }
+    .topbar-brand strong { color: var(--navy); font-size: 14px; }
+    .topbar-brand small { color: var(--muted); font-size: 11px; }
+    .notification-btn { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 10px; color: var(--navy); background: #fff; font-size: 20px; }
+    .notification-btn:hover { background: var(--purple-light); }
+    .notification-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; vertical-align: middle; }
+    .search { width: min(30vw, 300px); padding: 9px 13px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .profile-chip { display: flex; align-items: center; gap: 9px; white-space: nowrap; }
+    .avatar { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; color: #fff; background: var(--purple); font-weight: 800; }
+    main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(18px, 4vw, 48px) 54px; }
+    .page[hidden] { display: none; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(25px, 5vw, 50px);
+      border-radius: 22px;
+      color: #fff;
+      background: linear-gradient(120deg, #111827, #33245f 62%, #7047d1);
+      box-shadow: var(--shadow);
+    }
+    .hero::after { position: absolute; right: 5%; bottom: -120px; width: 330px; height: 330px; border: 1px solid #ffffff30; border-radius: 50%; content: ""; box-shadow: 0 0 0 34px #ffffff0b, 0 0 0 70px #ffffff0b; }
+    .eyebrow { color: #d9d0ff; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .hero h2 { position: relative; z-index: 1; max-width: 650px; margin: 8px 0 10px; font-size: clamp(28px, 4vw, 42px); line-height: 1.12; }
+    .hero p { position: relative; z-index: 1; max-width: 650px; margin: 0; color: #eeeaff; }
+    .hero-topics { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .hero-topics span { padding: 5px 10px; border: 1px solid #ffffff40; border-radius: 999px; color: #fff; background: #ffffff12; font-size: 12px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 30px 0 14px; }
+    .section-heading h2, .section-heading h3 { margin: 0; color: var(--navy); }
+    .section-heading p { margin: 3px 0 0; color: var(--muted); }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 15px; }
+    .card {
+      min-width: 0;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--white);
+      box-shadow: 0 4px 18px rgba(24, 25, 58, .045);
+    }
+    .card h3 { margin: 0 0 6px; color: var(--navy); font-size: 17px; }
+    .card p { margin: 0; color: var(--muted); }
+    .quick-card { display: flex; min-height: 134px; flex-direction: column; align-items: flex-start; justify-content: space-between; border: 1px solid var(--line); border-radius: 15px; padding: 17px; color: var(--ink); background: #fff; text-align: left; }
+    .quick-card:hover { border-color: #9a7be8; transform: translateY(-2px); }
+    .quick-card strong { color: var(--navy); font-size: 16px; }
+    .quick-card small { color: var(--muted); }
+    .quick-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; color: var(--purple); background: var(--purple-light); font-size: 19px; }
+    .dashboard-columns { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(290px, .85fr); gap: 18px; margin-top: 24px; align-items: start; }
+    .stack { display: grid; gap: 15px; align-content: start; }
+    .student-id-card { grid-column: 2; grid-row: 1; padding: 17px; }
+    .id-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+    .id-card-heading .eyebrow { color: var(--purple); }
+    .id-card-logo { display: block; width: 88px; height: 45px; object-fit: contain; }
+    .id-card-content { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; align-items: start; }
+    .id-photo { width: 92px; height: 116px; border: 2px solid var(--purple-border); border-radius: 10px; object-fit: cover; object-position: center 28%; }
+    .id-photo-placeholder { display: grid; width: 92px; height: 116px; place-items: center; border: 2px solid var(--purple-border); border-radius: 10px; color: var(--purple); background: var(--purple-light); font-size: 24px; font-weight: 800; }
+    .id-name-label { margin: 0 0 2px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .id-details h2 { margin: 0 0 10px; color: var(--navy); font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
+    .id-fields { display: grid; gap: 8px; margin: 0; }
+    .id-fields div { min-width: 0; }
+    .id-fields dt { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .id-fields dd { margin: 0; color: var(--ink); font-size: 12px; font-weight: 650; overflow-wrap: anywhere; }
+    .github-link { display: inline-block; margin-top: 12px; color: var(--purple); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+    .resume-link { display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; padding: 8px 12px; border: 1px solid var(--purple); border-radius: 9px; color: #fff; background: var(--purple); font-size: 12px; font-weight: 700; text-decoration: none; }
+    .resume-link:hover { background: var(--navy); }
+    .dashboard-content { display: grid; grid-column: 1; grid-row: 1; gap: 18px; min-width: 0; }
+    .dashboard-content .section-heading { margin: 0 0 14px; }
+    .dashboard-content .card-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
+    .dashboard-info { display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; }
+    .faculty-tag { display: inline-block; margin-top: 8px; padding: 3px 9px; border-radius: 99px; color: var(--purple); background: var(--purple-light); font-size: 12px; }
+    .primary-btn, .secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 13px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      font-weight: 700;
+    }
+    .primary-btn { color: #fff; background: var(--purple); }
+    .primary-btn:hover { background: var(--navy); }
+    .secondary-btn { border-color: var(--line); color: var(--purple); background: #fff; }
+    .secondary-btn:hover { background: var(--purple-light); }
+    .module-card { display: grid; gap: 12px; }
+    .module-top { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+    .module-files { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+    .module-files a, .upload-list a { color: var(--purple); overflow-wrap: anywhere; }
+    .module-file-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .module-file-row > a { min-width: 0; overflow-wrap: anywhere; }
+    .module-book-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    .module-book-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; }
+    .module-book-name { min-width: 0; overflow-wrap: anywhere; }
+    .book-viewer[hidden] { display: none; }
+    .book-viewer { position: fixed; inset: 0; z-index: 20; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; padding: clamp(8px, 1.5vw, 18px); background: #111827f2; color: #fff; }
+    .book-toolbar, .book-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .book-toolbar h2 { min-width: 0; margin: 0; overflow: hidden; font-size: clamp(15px, 2vw, 20px); text-overflow: ellipsis; white-space: nowrap; }
+    .book-close, .book-controls button { padding: 9px 14px; border: 1px solid #ffffff4d; border-radius: 9px; color: #fff; background: #ffffff18; font: inherit; font-weight: 700; }
+    .book-close:hover, .book-controls button:hover:not(:disabled) { background: #7047d1; }
+    .book-controls button:disabled { opacity: .45; cursor: not-allowed; }
+    .book-zoom-controls { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 5px; }
+    .book-zoom-controls button { min-width: 34px; padding: 3px 8px; font-size: 13px; }
+    .book-zoom-level { min-width: 42px; color: #e4e0ef; font-size: 11px; text-align: center; }
+    .book-spread { position: relative; display: grid; width: min(100%, 1400px); height: min(78vh, 900px); min-height: 320px; max-height: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); align-self: center; justify-self: center; overflow: hidden; border-radius: 7px; background: #d8d3e2; box-shadow: 0 24px 70px #0008; perspective: 1600px; transform-style: preserve-3d; }
+    .book-spread.single-page { grid-template-columns: minmax(0, 1fr); }
+    .book-spread.single-page #bookLeftPage { display: none; }
+    .book-spread.single-page::after { display: none; }
+    .book-spread.single-page .book-page + .book-page { border-left: 0; box-shadow: none; }
+    .book-spread::after { position: absolute; z-index: 2; top: 0; bottom: 0; left: calc(50% - 7px); width: 14px; background: linear-gradient(90deg, #171b3512, #171b3530 43%, #fff9 50%, #171b3526 60%, #171b3508); content: ""; pointer-events: none; }
+    .book-page { display: grid; min-width: 0; min-height: 0; place-items: center; overflow: hidden; background: #fff; cursor: grab; touch-action: none; backface-visibility: hidden; }
+    .book-page + .book-page { border-left: 1px solid #c8c2d1; box-shadow: inset 12px 0 18px -18px #171b35; }
+    .book-page canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .book-page-empty { color: #696b82; font-size: 14px; }
+    @property --book-curl-x { syntax: "<percentage>"; inherits: true; initial-value: 92%; }
+    @property --book-curl-opacity { syntax: "<number>"; inherits: true; initial-value: 0; }
+    .book-flip-sheet { position: absolute; top: 0; z-index: 3; width: 50%; height: 100%; overflow: visible; pointer-events: none; transform-style: preserve-3d; will-change: transform; }
+    .book-spread.single-page .book-flip-sheet { left: 0; width: 100%; }
+    .book-spread.single-page .book-flip-next { transform-origin: right center; }
+    .book-spread.single-page .book-flip-previous { transform-origin: left center; }
+    .book-flip-next { left: 50%; transform-origin: left center; }
+    .book-flip-previous { left: 0; transform-origin: right center; }
+    .book-flip-face { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; background: #fff; backface-visibility: hidden; box-shadow: 0 0 16px #171b3526; }
+    .book-flip-face::after { position: absolute; inset: 0; content: ""; pointer-events: none; }
+    .book-flip-next .book-flip-front::after { background: linear-gradient(90deg, transparent 76%, #171b3508 90%, #171b3526); }
+    .book-flip-next .book-flip-back::after { background: linear-gradient(90deg, #171b3524, transparent 24%); }
+    .book-flip-previous .book-flip-front::after { background: linear-gradient(270deg, transparent 76%, #171b3508 90%, #171b3526); }
+    .book-flip-previous .book-flip-back::after { background: linear-gradient(270deg, #171b3524, transparent 24%); }
+    .book-flip-sheet::before { position: absolute; z-index: 2; top: 1%; bottom: 1%; left: var(--book-curl-x, 92%); width: 9%; border-radius: 50%; background: linear-gradient(90deg, #171b3524, #fff9 48%, #171b3538 76%, transparent); content: ""; opacity: var(--book-curl-opacity, 0); filter: blur(1px); pointer-events: none; transform: scaleX(1.4); }
+    .book-flip-previous::before { background: linear-gradient(270deg, #171b3524, #fff9 48%, #171b3538 76%, transparent); }
+    .book-flip-back { transform: rotateY(180deg); background: #fffefa; }
+    .book-flip-face canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .book-hand-hint { position: absolute; right: 15px; bottom: 14px; z-index: 4; display: flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid #d9cffb; border-radius: 999px; color: #171b35; background: #fffefaed; box-shadow: 0 3px 14px #171b3526; font-size: 12px; font-weight: 700; pointer-events: none; transition: opacity .2s ease, visibility .2s ease; }
+    .book-hand-hint span:first-child { display: inline-block; font-size: 21px; animation: hand-wave 1s ease-in-out infinite; transform-origin: 65% 80%; }
+    .book-spread.has-interacted .book-hand-hint { visibility: hidden; opacity: 0; }
+    @keyframes hand-wave { 50% { transform: translateY(-4px) rotate(-12deg); } }
+    .book-spread.is-dragging .book-page { cursor: grabbing; }
+    .book-status { min-width: 120px; text-align: center; font-variant-numeric: tabular-nums; }
+    .book-controls-info { display: grid; gap: 2px; text-align: center; }
+    .book-tip { color: #c8c2d8; font-size: 11px; }
+    .book-loading { grid-column: 1/-1; align-self: center; justify-self: center; padding: 24px; }
+    @media (max-width: 620px) {
+      .book-spread { width: 100%; height: 68vh; min-height: 260px; }
+      .book-page-empty { font-size: 11px; }
+      .book-close, .book-controls button { padding: 8px 10px; }
+      .book-status { min-width: 95px; font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .book-hand-hint span:first-child { animation: none; }
+    }
+    .submodule-box { padding-top: 11px; border-top: 1px solid var(--line); }
+    .submodule-box h4 { margin: 0 0 6px; color: var(--navy); font-size: 13px; }
+    .submodule-list { margin: 0 0 10px 18px; padding: 0; color: var(--muted); }
+    .submodule-form { display: flex; flex-wrap: wrap; gap: 7px; }
+    .submodule-form input { flex: 1; min-width: 120px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+    .file-input { display: none; }
+    .upload-list { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+    .upload-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; }
+    .about-intro { padding: 22px; border-radius: 15px; color: var(--navy); background: var(--purple-light); }
+    .about-intro p { margin: 0; }
+    .step-number { display: grid; width: 32px; height: 32px; place-items: center; margin-bottom: 12px; border-radius: 10px; color: #fff; background: var(--purple); font-weight: 800; }
+    .check-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .check-list li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+    .tech-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .tech-table th, .tech-table td { padding: 11px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .tech-table th { color: var(--navy); }
+    .empty-state { grid-column: 1/-1; padding: 24px; border: 1px dashed #b9addf; border-radius: 12px; color: var(--muted); text-align: center; }
+    .notice { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: min(420px, calc(100vw - 40px)); padding: 12px 16px; border-radius: 10px; color: #fff; background: #171b35; box-shadow: var(--shadow); }
+    .notice[hidden] { display: none; }
+    .brand-mark { background: linear-gradient(135deg, #8b73eb, #6043c4); }
+    .sidebar .brand strong { max-width: 155px; line-height: 1.25; }
+    .nav-button.active { box-shadow: inset 3px 0 #b9a9ff; }
+    .topbar-tools { flex-wrap: wrap; }
+    .profile-chip { padding: 5px 9px; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+    .student-id-card { grid-row: auto; }
+    .dashboard-columns { grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr); }
+    .dashboard-content { grid-column: auto; grid-row: auto; }
+    .dashboard-columns > .student-id-card { grid-column: 2; }
+    .dashboard-columns > .dashboard-content { grid-column: 1; }
+    .profile-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    .profile-actions .resume-link { margin-top: 0; }
+    .profile-detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 13px; margin-top: 15px; }
+    .profile-detail { padding: 13px; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+    .profile-detail small, .profile-detail strong { display: block; }
+    .profile-detail small { color: var(--muted); font-size: 11px; text-transform: uppercase; }
+    .profile-detail strong { margin-top: 3px; color: var(--navy); }
+    .module-card { min-height: 210px; align-content: start; }
+    .module-description { color: var(--muted); }
+    .module-number { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; color: var(--purple); background: var(--purple-light); font-weight: 800; }
+    .form-card { display: grid; gap: 12px; max-width: 760px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-field { display: grid; gap: 5px; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-field label { color: var(--navy); font-size: 13px; font-weight: 700; }
+    .form-field input, .form-field textarea, .assistant-form textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff;
+    }
+    .form-field select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff; font: inherit; }
+    .form-field textarea, .assistant-form textarea { min-height: 90px; resize: vertical; }
+    .helper-text { color: var(--muted); font-size: 12px; }
+    .project-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 14px; margin-top: 18px; }
+    .project-card { display: grid; align-content: start; gap: 9px; }
+    .project-card p { overflow-wrap: anywhere; }
+    .project-link { color: var(--purple); font-weight: 700; overflow-wrap: anywhere; }
+    .empty-projects { grid-column: 1/-1; }
+    .ai-panel { max-width: 850px; }
+    .ai-badge { display: inline-flex; padding: 4px 9px; border-radius: 99px; color: var(--purple); background: var(--purple-light); font-size: 11px; font-weight: 800; }
+    .assistant-form { display: grid; gap: 10px; margin-top: 16px; }
+    .assistant-response { min-height: 70px; margin-top: 14px; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: #fff; white-space: pre-wrap; }
+    @media (max-width: 1000px) {
+      .topbar { flex-wrap: wrap; }
+      .topbar-tools { margin-left: auto; }
+    }
+    @media (max-width: 860px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; padding: 12px; }
+      .brand { padding-bottom: 12px; }
+      .nav-label, .sidebar-note { display: none; }
+      .nav-list { display: flex; overflow-x: auto; padding-bottom: 3px; }
+      .nav-button { flex: 0 0 auto; width: auto; padding: 9px 11px; }
+      .nav-button span:last-child { white-space: nowrap; }
+      .topbar { top: 0; }
+    }
+    @media (max-width: 620px) {
+      .topbar { align-items: flex-start; flex-direction: column; gap: 9px; }
+      .topbar-brand { display: none; }
+      .topbar-tools { width: 100%; justify-content: space-between; }
+      .search { width: min(62vw, 300px); }
+      .dashboard-columns { grid-template-columns: 1fr; gap: 12px; }
+      .dashboard-columns > .student-id-card, .dashboard-columns > .dashboard-content { grid-column: auto; }
+      .student-id-card { padding: 13px; }
+      .id-card-logo { width: 68px; height: 36px; }
+      .id-card-content { grid-template-columns: 68px minmax(0, 1fr); gap: 10px; }
+      .id-photo { width: 68px; height: 90px; }
+      .id-details h2 { font-size: 14px; }
+      .dashboard-info { grid-template-columns: 1fr; }
+      main { padding-top: 18px; }
+    }
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-field.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">DS</div>
+        <div><strong>MBU Digital Library</strong><small>Your Academic Space, All in One Place</small></div>
+      </div>
+      <div class="nav-label">Student Library</div>
+      <nav class="nav-list" id="mainNavigation">
+        <button class="nav-button active" type="button" data-page="dashboard"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
+        <button class="nav-button" type="button" data-page="modules"><span class="nav-icon">▤</span><span>Modules</span></button>
+        <button class="nav-button" type="button" data-page="learning"><span class="nav-icon">◷</span><span>My Learning</span></button>
+        <button class="nav-button" type="button" data-page="lab"><span class="nav-icon">⌘</span><span>Lab Experiments</span></button>
+        <button class="nav-button" type="button" data-page="tools"><span class="nav-icon">⚙</span><span>Tools</span></button>
+        <button class="nav-button" type="button" data-page="study"><span class="nav-icon">▧</span><span>Study Materials</span></button>
+        <button class="nav-button" type="button" data-page="references"><span class="nav-icon">⌕</span><span>References</span></button>
+        <button class="nav-button" type="button" data-page="assignments"><span class="nav-icon">☷</span><span>Assignments</span></button>
+        <button class="nav-button" type="button" data-page="quizzes"><span class="nav-icon">✓</span><span>Quizzes &amp; Tests</span></button>
+        <button class="nav-button" type="button" data-page="projects"><span class="nav-icon">⌘</span><span>Projects</span></button>
+        <button class="nav-button" type="button" data-page="profile"><span class="nav-icon">◉</span><span>Academic Profile</span></button>
+        <button class="nav-button" type="button" data-page="ai"><span class="nav-icon">✦</span><span>AI Model</span></button>
+        <button class="nav-button" type="button" data-page="about"><span class="nav-icon">ⓘ</span><span>About this project</span></button>
+      </nav>
+      <div class="sidebar-note">A focused learning space for Data Science students.</div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-brand">
+          <img src="assets/mbu-logo.png" alt="Mohan Babu University logo">
+          <div><strong>MBU Digital Library</strong><small>Your Academic Space, All in One Place</small></div>
+        </div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="topbar-tools">
+          <input id="searchInput" class="search" type="search" placeholder="Search this page..." aria-label="Search this page">
+          <button class="notification-btn" id="notificationsButton" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+          <div class="profile-chip"><span class="avatar" id="profileAvatar" aria-hidden="true">TC</span><strong id="profileChipName">Charitha</strong></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="page" id="page-dashboard">
+          <div class="hero">
+            <span class="eyebrow">MBU · CSE (Data Science)</span>
+            <h2>Welcome to Digital Library Management System</h2>
+            <p>Your academic space for course modules, lab experiments, study materials, assignments, and projects.</p>
+            <div class="hero-topics" aria-label="Learning topics">
+              <span>🐍 Python</span><span>▦ SQL</span><span>☁ AWS</span><span>📚 Books</span><span>💻 Computers</span>
+            </div>
+          </div>
+          <div class="dashboard-columns">
+            <article class="card student-id-card" aria-label="Student identity card">
+              <div class="id-card-heading"><span class="eyebrow">Student ID Card</span><img class="id-card-logo" src="assets/mbu-logo.png" alt="Mohan Babu University logo"></div>
+              <div class="id-card-content">
+                <div class="id-photo-placeholder" aria-label="Student photo placeholder">S</div>
+                <div class="id-details">
+                  <p class="id-name-label">Name</p>
+                  <h2 id="profileName">Student Name</h2>
+                  <dl class="id-fields">
+                    <div><dt>Register no</dt><dd id="profileRegisterNo">Not provided</dd></div>
+                    <div><dt>Branch / Department</dt><dd id="profileCourse">CSE (Data Science)</dd></div>
+                    <div><dt>Semester / Year</dt><dd id="profileSemester">5th Semester · Year 3</dd></div>
+                    <div><dt>Lecturer</dt><dd id="profileLecturer">BosuBabu · Assistant Professor</dd></div>
+                    <div><dt>University</dt><dd id="profileUniversity">Mohan Babu University</dd></div>
+                  </dl>
+                  <div class="profile-actions"><button class="secondary-btn" type="button" data-page="profile">View My Academic Profile →</button></div>
+                </div>
+              </div>
+              </article>
+            <div class="dashboard-content">
+              <section aria-labelledby="quickAccessHeading">
+                <div class="section-heading"><div><h2 id="quickAccessHeading">Quick Access</h2><p>Jump to a learning area.</p></div></div>
+                <div class="card-grid" id="quickAccess">
+                  <button class="quick-card" type="button" data-page="lab"><span class="quick-icon">⌘</span><strong>Lab Experiments</strong><small>Organize practical files →</small></button>
+                  <button class="quick-card" type="button" data-page="tools"><span class="quick-icon">⚙</span><strong>Tools</strong><small>Browse data science tools →</small></button>
+                  <button class="quick-card" type="button" data-page="references"><span class="quick-icon">⌕</span><strong>References</strong><small>Save useful reference files →</small></button>
+                  <button class="quick-card" type="button" data-page="study"><span class="quick-icon">▧</span><strong>Study Materials</strong><small>Keep notes and resources together →</small></button>
+                  <button class="quick-card" type="button" data-page="assignments"><span class="quick-icon">☷</span><strong>Assignments</strong><small>Organize coursework →</small></button>
+                  <button class="quick-card" type="button" data-page="projects"><span class="quick-icon">⌘</span><strong>Projects</strong><small>Manage project files and GitHub links →</small></button>
+                </div>
+              </section>
+              <div class="dashboard-info">
+                <article class="card">
+                <h3>Faculty Information</h3><p><strong id="facultyName">BosuBabu</strong><br>Assistant Professor</p><span class="faculty-tag">CSE · Data Science</span>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-profile" hidden>
+          <div class="section-heading"><div><span class="eyebrow">Student account</span><h2>Academic Profile</h2><p>Your student and course information.</p></div></div>
+          <article class="card">
+            <div class="id-card-heading">
+              <div><h3 id="academicProfileName">Student Name</h3><p id="academicProfileCourse">CSE (Data Science)</p></div>
+              <img class="id-card-logo" src="assets/mbu-logo.png" alt="Mohan Babu University logo">
+            </div>
+            <div class="profile-detail-grid">
+              <div class="profile-detail"><small>Register number</small><strong id="academicProfileRegisterNo">Not provided</strong></div>
+              <div class="profile-detail"><small>Semester / Year</small><strong id="academicProfileSemester">5th Semester · Year 3</strong></div>
+              <div class="profile-detail"><small>Faculty</small><strong id="academicProfileLecturer">BosuBabu · Assistant Professor</strong></div>
+              <div class="profile-detail"><small>University</small><strong id="academicProfileUniversity">Mohan Babu University</strong></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="page" id="page-modules" hidden>
+          <div class="section-heading"><div><h2>Data Science Modules</h2><p>Your course modules and reading materials. Module 1 opens as a two-page flipbook.</p></div><button class="primary-btn" id="addModuleButton" type="button">＋ Add module</button></div>
+          <input class="file-input" id="moduleFileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp" multiple>
+          <div class="card-grid" id="modulesGrid"></div>
+        </section>
+
+        <section class="page" id="page-lab" hidden>
+          <div class="section-heading"><div><h2>Lab Experiments</h2><p>Upload and organize experiment instructions, practical reports, and supporting files.</p></div></div>
+          <div class="section-heading"><div><h3>Experiment files and reports</h3><p>Keep your lab work together in this browser.</p></div><button class="primary-btn" id="labUploadButton" type="button">＋ Add lab files</button></div>
+          <input class="file-input" id="labFileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp" multiple>
+          <article class="card"><ul class="upload-list" id="labFileList"></ul></article>
+        </section>
+
+        <section class="page" id="page-projects" hidden>
+          <div class="section-heading"><div><h2>Projects</h2><p>Document your academic projects and link each one to its GitHub repository.</p></div></div>
+          <form class="card form-card" id="projectForm">
+            <h3>Add a project</h3>
+            <div class="form-grid">
+              <div class="form-field"><label for="projectName">Project title</label><input id="projectName" name="title" maxlength="100" placeholder="e.g. Exploratory Data Analysis" required></div>
+              <div class="form-field"><label for="projectModule">Module</label><select id="projectModule" name="module"><option>Statistical Methods for Data Science</option><option>Python Programming for Data Science</option><option>Data Warehousing and Data Mining</option><option>Machine Learning</option><option>Big Data Analytics</option></select></div>
+              <div class="form-field full"><label for="projectDescription">Short description</label><textarea id="projectDescription" name="description" maxlength="300" placeholder="What did you build or investigate?"></textarea></div>
+              <div class="form-field full"><label for="projectGithub">GitHub repository URL</label><input id="projectGithub" name="github" type="url" placeholder="https://github.com/username/repository" required></div>
+            </div>
+            <p class="helper-text">Use a GitHub repository URL (github.com). Projects are saved in this browser.</p>
+            <div><button class="primary-btn" type="submit">＋ Add project</button></div>
+          </form>
+          <div class="project-list" id="projectList" aria-live="polite"></div>
+        </section>
+
+        <section class="page" id="page-ai" hidden>
+          <div class="section-heading"><div><h2>AI Study Model</h2><p>Ask a question and get a quick study prompt for core Data Science topics.</p></div></div>
+          <article class="card ai-panel">
+            <span class="ai-badge">Learning assistant preview</span>
+            <p class="helper-text">This offline prototype gives topic-based study guidance; it is not connected to a live AI service.</p>
+            <form class="assistant-form" id="assistantForm">
+              <label for="assistantQuestion"><strong>What would you like to learn?</strong></label>
+              <textarea id="assistantQuestion" placeholder="Try: explain linear regression, Python pandas, or data mining" required></textarea>
+              <div><button class="primary-btn" type="submit">Ask study assistant</button></div>
+            </form>
+            <div class="assistant-response" id="assistantResponse" role="status" aria-live="polite">Your study guidance will appear here.</div>
+          </article>
+        </section>
+
+        <section class="page" id="page-generic" hidden>
+          <div class="section-heading"><div><h2 id="genericTitle">Learning Materials</h2><p id="genericDescription">Add and organize files for this area.</p></div><button class="primary-btn" id="uploadAreaButton" type="button">＋ Add files</button></div>
+          <input class="file-input" id="areaFileInput" type="file" multiple>
+          <section id="toolDirectory" hidden aria-labelledby="toolDirectoryHeading">
+            <div class="section-heading"><div><h3 id="toolDirectoryHeading">Recommended data science tools</h3><p>Open these external tools to learn, analyze, and build projects.</p></div></div>
+            <div class="card-grid">
+              <article class="card"><h3>Google Colab</h3><p>Run Python notebooks in the browser.</p><a class="project-link" href="https://colab.research.google.com/" target="_blank" rel="noopener noreferrer">Open Colab ↗</a></article>
+              <article class="card"><h3>Kaggle</h3><p>Practice with datasets, notebooks, and competitions.</p><a class="project-link" href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer">Open Kaggle ↗</a></article>
+              <article class="card"><h3>Jupyter</h3><p>Create interactive notebooks for code and analysis.</p><a class="project-link" href="https://jupyter.org/" target="_blank" rel="noopener noreferrer">Open Jupyter ↗</a></article>
+              <article class="card"><h3>GitHub</h3><p>Version, document, and share your code projects.</p><a class="project-link" href="https://github.com/" target="_blank" rel="noopener noreferrer">Open GitHub ↗</a></article>
+              <article class="card"><h3>scikit-learn</h3><p>Explore Python tools for machine learning.</p><a class="project-link" href="https://scikit-learn.org/" target="_blank" rel="noopener noreferrer">Open scikit-learn ↗</a></article>
+            </div>
+          </section>
+          <article class="card"><h3 id="areaHeading">Files</h3><ul class="upload-list" id="areaFileList"></ul></article>
+        </section>
+
+        <section class="page" id="page-about" hidden>
+          <div class="section-heading"><div><span class="eyebrow">Project overview</span><h2>About the MBU Digital Library</h2><p>A walkthrough of the project, its purpose, design, and features.</p></div></div>
+          <div class="about-intro"><p>The MBU Digital Library is a student-focused academic website designed to organize learning resources, assignments, and other educational materials in one place. It provides CSE (Data Science) students with a clear dashboard for finding and managing their learning materials.</p></div>
+          <div class="section-heading"><div><h3>How the project is organized</h3><p>Key steps and features represented in the website.</p></div></div>
+          <div class="card-grid">
+            <article class="card"><span class="step-number">1</span><h3>Project Planning</h3><p>The project brings common academic needs together: modules, study materials, lab work, assignments, quizzes, projects, and references.</p></article>
+            <article class="card"><span class="step-number">2</span><h3>Design and Theme</h3><p>A dark navy and purple palette, white cards, rounded corners, simple icons, and soft borders create a consistent, readable interface.</p></article>
+            <article class="card"><span class="step-number">3</span><h3>Header and Identity</h3><p>The header displays the MBU logo, library title and tagline, current page, page search, a notifications control, and student profile context.</p></article>
+            <article class="card"><span class="step-number">4</span><h3>Sidebar Navigation</h3><p>The sidebar links to the dashboard, modules, My Learning, lab experiments, tools, study materials, references, assignments, quizzes and tests, projects, academic profile, and this project overview.</p></article>
+            <article class="card"><span class="step-number">5</span><h3>Welcome Banner</h3><p>The dashboard welcome area introduces the Data Science library and directs students to its academic content.</p></article>
+            <article class="card"><span class="step-number">6</span><h3>Quick Access</h3><p>Six dashboard cards provide working shortcuts to lab experiments, tools, references, study materials, assignments, and projects.</p></article>
+            <article class="card"><span class="step-number">7</span><h3>Student Identity</h3><p>A student profile card presents the student context and course information in one place.</p></article>
+            <article class="card"><span class="step-number">8</span><h3>Faculty Information</h3><p>A separate faculty card displays BosuBabu and the designation Assistant Professor.</p></article>
+            <article class="card"><span class="step-number">9</span><h3>Academic Profile</h3><p>The dashboard link opens a dedicated academic profile page with student, course, faculty, university, resume, and GitHub details.</p></article>
+            <article class="card"><span class="step-number">10</span><h3>Module Management</h3><p>Module 1 includes five bundled PDFs that open in an offline two-page flipbook. Tap a page or drag it across the book to turn pages; keyboard and navigation controls are also available.</p></article>
+            <article class="card"><span class="step-number">11</span><h3>Testing</h3><p>Verify navigation, page search, module uploads, submodule entry, links, images, and responsive layouts before presenting the site.</p></article>
+          </div>
+          <div class="section-heading"><div><h3>Technologies in this implementation</h3><p>This project is a static, browser-based website.</p></div></div>
+          <article class="card">
+            <div style="overflow-x:auto">
+              <table class="tech-table">
+                <thead><tr><th>Technology</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td>HTML</td><td>Defines the page structure, navigation, and academic content.</td></tr>
+                  <tr><td>CSS</td><td>Styles the layout, dark navy and purple theme, cards, and responsive views.</td></tr>
+                  <tr><td>JavaScript and PDF.js</td><td>Control navigation, search, module interactions, and the two-page PDF flipbook, which renders the bundled PDFs locally.</td></tr>
+                  <tr><td>Browser local storage</td><td>Stores profile, module, project, and uploaded-file data in the current browser; this static version has no server database.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+          <div class="section-heading"><div><h3>Before presenting</h3><p>Run through these checks in the browser.</p></div></div>
+          <ul class="check-list">
+            <li>Open each navigation item and all six quick-access cards.</li><li>Search for a visible item on the current page.</li>
+            <li>Add a module file and check its link.</li><li>Add a submodule and refresh to confirm it is saved.</li>
+            <li>Open each Module 1 PDF, tap or drag a page to turn it, and confirm both pages in each spread.</li>
+            <li>Upload a file to each learning area and confirm it persists after refresh.</li>
+            <li>Open the academic profile link and confirm its links work.</li>
+            <li>Check layout on a narrow screen.</li><li>Confirm profile and faculty details are accurate.</li>
+          </ul>
+          <div class="section-heading"><div><h3>Short presentation summary</h3></div></div>
+          <article class="card"><p>“My project is the MBU Digital Library, designed to give CSE (Data Science) students one place to access and organize academic resources. The dashboard includes a welcome banner, navigation, six quick-access cards, and student and faculty information. Students can browse course modules, add module files and subtopics, upload learning materials, manage lab experiments and projects separately, and view an academic profile. The interface combines a dark navy and purple theme and is built with HTML, CSS, and JavaScript. Data is stored in the browser; this version does not use a backend database.”</p></article>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+  <section class="book-viewer" id="bookViewer" role="dialog" aria-modal="true" aria-labelledby="bookTitle" hidden>
+    <div class="book-toolbar">
+      <h2 id="bookTitle">Introduction of Data Science</h2>
+      <button class="book-close" id="closeBookButton" type="button" aria-label="Close flipbook">Close ×</button>
+    </div>
+    <div class="book-spread" id="bookSpread" aria-live="polite">
+      <div class="book-page" id="bookLeftPage"><span class="book-page-empty">Loading page…</span></div>
+      <div class="book-page" id="bookRightPage"><span class="book-page-empty">Loading page…</span></div>
+      <div class="book-hand-hint" aria-hidden="true"><span>👆</span><span>Drag a page to flip</span></div>
+    </div>
+    <div class="book-controls">
+      <button id="previousSpreadButton" type="button">← Previous</button>
+      <span class="book-controls-info"><span class="book-status" id="bookStatus" aria-label="Current page or spread"></span><small class="book-tip">Drag a page edge or use the arrows to turn pages</small><span class="book-zoom-controls" aria-label="Page viewing controls"><button id="bookLayoutButton" type="button" aria-label="Switch page layout">Two-page spread</button><button id="zoomOutButton" type="button" aria-label="Zoom out" title="Zoom out">−</button><span class="book-zoom-level" id="bookZoomLevel">100%</span><button id="zoomInButton" type="button" aria-label="Zoom in" title="Zoom in">+</button><button id="resetZoomButton" type="button" aria-label="Reset zoom" title="Fit page">Fit</button></span></span>
+      <button id="nextSpreadButton" type="button">Next →</button>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      const moduleStorageKey = 'mbuDigitalLibraryModules';
+      const areaStorageKey = 'mbuDigitalLibraryAreaFiles';
+      const projectStorageKey = 'mbuDigitalLibraryProjects';
+      const profileStorageKey = 'mbuDigitalLibraryProfile';
+      const moduleOnePdfBooks = [
+        { name: 'Decision Tree Classification.pdf', file: 'assets/module-1/Decision Tree Classification.pdf', data: 'assets/module-1/books/decision-tree-classification.js' },
+        { name: 'Feature Selection.pdf', file: 'assets/module-1/Feature Selection.pdf', data: 'assets/module-1/books/feature-selection.js' },
+        { name: 'Decision Tree Classification (Notes).pdf', file: 'assets/module-1/Decision Tree Classification (Notes).pdf', data: 'assets/module-1/books/decision-tree-classification-notes.js' },
+        { name: 'User Retention.pdf', file: 'assets/module-1/User Retention.pdf', data: 'assets/module-1/books/user-retention.js' },
+        { name: 'Module 1 Combined.pdf', file: 'assets/module-1/Module 1 Combined.pdf', data: 'assets/module-1/books/module-1-combined.js' }
+      ];
+      const moduleTwoPdfBooks = [
+        { name: 'Data Analysis and Analytics.pdf', file: 'assets/module-2/Data Analysis and Analytics.pdf', data: 'assets/module-2/books/data-analysis-and-analytics.js' },
+        { name: 'Data Collection and Data Pre-Processing.pdf', file: 'assets/module-2/Data Collection and Data Pre-Processing.pdf', data: 'assets/module-2/books/data-collection-and-data-pre-processing.js' },
+        { name: 'Data Processing.pdf', file: 'assets/module-2/Data Processing.pdf', data: 'assets/module-2/books/data-processing.js' },
+        { name: 'Decision Tree Classification -1.pdf', file: 'assets/module-2/Decision Tree Classification -1.pdf', data: 'assets/module-2/books/decision-tree-classification-1.js' },
+        { name: 'Descriptive Analysis.pdf', file: 'assets/module-2/Descriptive Analysis.pdf', data: 'assets/module-2/books/descriptive-analysis.js' },
+        { name: 'Diagnostic Analytics.pdf', file: 'assets/module-2/Diagnostic Analytics.pdf', data: 'assets/module-2/books/diagnostic-analytics.js' }
+      ];
+      const modulePdfBooksById = {
+        'ds-module-1': moduleOnePdfBooks,
+        'ds-module-2': moduleTwoPdfBooks
+      };
+      const defaultModules = [
+        { id: 'ds-module-1', name: 'Introduction of Data Science', description: 'Open your course PDFs as a two-page textbook and flip through each spread.' },
+        { id: 'ds-module-2', name: 'Python Programming for Data Science', description: 'Python fundamentals, NumPy, pandas, data cleaning, visualization, and data analytics materials.' },
+        { id: 'ds-module-3', name: 'Data Warehousing and Data Mining', description: 'Data preparation, warehousing concepts, mining methods, and pattern discovery.' },
+        { id: 'ds-module-4', name: 'Machine Learning', description: 'Supervised and unsupervised learning, model evaluation, and practical workflows.' },
+        { id: 'ds-module-5', name: 'Big Data Analytics', description: 'Distributed data processing, scalable analytics, and big data ecosystems.' }
+      ];
+      const defaultProfile = {
+        name: 'Student Name',
+        registerNo: 'Not provided',
+        course: 'CSE (Data Science)',
+        semester: '5th Semester',
+        year: 'Year 3',
+        lecturer: 'BosuBabu',
+        university: 'Mohan Babu University'
+      };
+      const areaDetails = {
+        tools: ['Tools', 'Collect useful academic and data science tools.'],
+        learning: ['My Learning', 'Keep the learning resources you are currently using together.'],
+        study: ['Study Materials', 'Add and organize notes, datasets, and course materials.'],
+        references: ['References', 'Save papers, books, articles, and other reference materials.'],
+        assignments: ['Assignments', 'Organize coursework and assignment files.'],
+        quizzes: ['Quizzes & Tests', 'Keep revision sheets, quizzes, and test preparation files together.'],
+        resources: ['Resources', 'Add and organize study notes, datasets, papers, and reference files.']
+      };
+      const pageTitle = document.getElementById('pageTitle');
+      const notice = document.getElementById('notice');
+      let noticeTimeout;
+      document.getElementById('notificationsButton').addEventListener('click', () => showNotice('You are all caught up. There are no new notifications.'));
+
+      function showNotice(message) {
+        notice.textContent = message;
+        notice.hidden = false;
+        clearTimeout(noticeTimeout);
+        noticeTimeout = setTimeout(() => { notice.hidden = true; }, 4000);
+      }
+
+      function loadArray(key) {
+        try {
+          const value = JSON.parse(localStorage.getItem(key) || '[]');
+          if (!Array.isArray(value)) throw new Error('Saved data must be a list.');
+          return value;
+        } catch (error) {
+          console.error(`Could not load ${key}.`, error);
+          showNotice('Saved library data could not be loaded. The list is empty for now.');
+          return [];
+        }
+      }
+
+      function saveArray(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+          return true;
+        } catch (error) {
+          console.error(`Could not save ${key}.`, error);
+          showNotice('Could not save this change in browser storage. Try a smaller file or remove older files.');
+          return false;
+        }
+      }
+
+      function readProfile() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
+          return saved && typeof saved === 'object' ? { ...defaultProfile, ...saved } : { ...defaultProfile };
+        } catch (error) {
+          console.error('Could not load the student profile.', error);
+          showNotice('The saved student profile could not be loaded; default details are shown.');
+          return { ...defaultProfile };
+        }
+      }
+
+      function saveProfile(profile) {
+        try {
+          localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+          return true;
+        } catch (error) {
+          console.error('Could not save the student profile.', error);
+          showNotice('Could not save profile details in this browser.');
+          return false;
+        }
+      }
+
+      let studentProfile = readProfile();
+      function renderProfile() {
+        document.getElementById('profileName').textContent = studentProfile.name;
+        document.getElementById('profileRegisterNo').textContent = studentProfile.registerNo;
+        document.getElementById('profileCourse').textContent = studentProfile.course;
+        document.getElementById('profileSemester').textContent = `${studentProfile.semester} · ${studentProfile.year}`;
+        document.getElementById('profileLecturer').textContent = `${studentProfile.lecturer} · Assistant Professor`;
+        document.getElementById('profileUniversity').textContent = studentProfile.university;
+        document.getElementById('academicProfileName').textContent = studentProfile.name;
+        document.getElementById('academicProfileCourse').textContent = studentProfile.course;
+        document.getElementById('academicProfileRegisterNo').textContent = studentProfile.registerNo;
+        document.getElementById('academicProfileSemester').textContent = `${studentProfile.semester} · ${studentProfile.year}`;
+        document.getElementById('academicProfileLecturer').textContent = `${studentProfile.lecturer} · Assistant Professor`;
+        document.getElementById('academicProfileUniversity').textContent = studentProfile.university;
+        document.getElementById('facultyName').textContent = studentProfile.lecturer;
+        document.getElementById('profileChipName').textContent = studentProfile.name.split(/\s+/)[0];
+        document.getElementById('profileAvatar').textContent = studentProfile.name.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+      }
+
+      function createElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+      }
+
+      function setPage(pageId) {
+        const routePage = pageId;
+        const isKnown = document.getElementById(`page-${routePage}`);
+        const selectedPage = isKnown || areaDetails[routePage] ? routePage : 'dashboard';
+        document.querySelectorAll('.page').forEach(page => {
+          page.hidden = page.id !== `page-${selectedPage}` && !(areaDetails[selectedPage] && page.id === 'page-generic');
+        });
+        document.querySelectorAll('.nav-button').forEach(button => button.classList.toggle('active', button.dataset.page === routePage));
+        const pageTitles = {
+          dashboard: 'Dashboard',
+          modules: 'Modules',
+          lab: 'Lab Experiments',
+          projects: 'Projects',
+          ai: 'AI Model',
+          profile: 'Academic Profile',
+          about: 'About this project'
+        };
+        pageTitle.textContent = pageTitles[routePage] || (areaDetails[selectedPage] || ['Learning Materials'])[0];
+        document.getElementById('searchInput').value = '';
+        applySearch('');
+        if (areaDetails[selectedPage]) renderAreaFiles(selectedPage);
+        if (selectedPage === 'lab') renderLabFiles();
+        if (selectedPage === 'projects') renderProjects();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      const bookViewer = document.getElementById('bookViewer');
+      const bookSpread = document.getElementById('bookSpread');
+      const bookStatus = document.getElementById('bookStatus');
+      const previousSpreadButton = document.getElementById('previousSpreadButton');
+      const nextSpreadButton = document.getElementById('nextSpreadButton');
+      const zoomOutButton = document.getElementById('zoomOutButton');
+      const zoomInButton = document.getElementById('zoomInButton');
+      const resetZoomButton = document.getElementById('resetZoomButton');
+      const bookLayoutButton = document.getElementById('bookLayoutButton');
+      const bookZoomLevel = document.getElementById('bookZoomLevel');
+      let pdfLibraryPromise = null;
+      let activeBookDocument = null;
+      let bookStartPage = 1;
+      let bookZoom = 1.1;
+      let bookSinglePage = false;
+      let bookRenderGeneration = 0;
+      let bookSpreadReady = false;
+      let bookTurning = false;
+      let bookOpenToken = 0;
+      let bookTrigger = null;
+      let bookGesture = null;
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.addEventListener('load', resolve, { once: true });
+          script.addEventListener('error', () => reject(new Error(`Could not load ${src}.`)), { once: true });
+          document.head.appendChild(script);
+        });
+      }
+
+      function loadPdfLibrary() {
+        if (!pdfLibraryPromise) {
+          pdfLibraryPromise = loadScript('assets/pdfjs/pdf.min.js').then(() => {
+            if (!window.pdfjsLib) throw new Error('The PDF reader did not initialize.');
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'assets/pdfjs/pdf.worker.min.js';
+            return window.pdfjsLib;
+          }).catch(error => {
+            pdfLibraryPromise = null;
+            throw error;
+          });
+        }
+        return pdfLibraryPromise;
+      }
+
+      const bookDataPromises = new Map();
+      function loadBookData(book) {
+        if (window.moduleOnePdfData && window.moduleOnePdfData[book.name]) {
+          return Promise.resolve(window.moduleOnePdfData[book.name]);
+        }
+        if (bookDataPromises.has(book.name)) return bookDataPromises.get(book.name);
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = book.data;
+          script.addEventListener('load', () => {
+            const data = window.moduleOnePdfData && window.moduleOnePdfData[book.name];
+            if (data) resolve(data);
+            else reject(new Error(`Could not load ${book.name}.`));
+          }, { once: true });
+          script.addEventListener('error', () => reject(new Error(`Could not load ${book.name}.`)), { once: true });
+          document.head.appendChild(script);
+        });
+        bookDataPromises.set(book.name, promise);
+        promise.catch(() => bookDataPromises.delete(book.name));
+        return promise;
+      }
+
+      function showBookError(error) {
+        console.error('Could not display the flipbook.', error);
+        bookStatus.textContent = 'Could not open this PDF.';
+        bookSpread.replaceChildren(createElement('p', 'book-loading', 'The PDF could not be opened. Close the book and try again.'));
+        showNotice('Could not open this PDF. Try opening the original PDF link instead.');
+      }
+
+      function updateBookControls() {
+        if (!activeBookDocument) return;
+        const pageStep = bookSinglePage ? 1 : 2;
+        previousSpreadButton.disabled = !bookSpreadReady || bookTurning || bookStartPage <= 1;
+        nextSpreadButton.disabled = !bookSpreadReady || bookTurning || bookStartPage + pageStep > activeBookDocument.numPages;
+        zoomOutButton.disabled = !bookSpreadReady || bookTurning || bookZoom <= 1;
+        zoomInButton.disabled = !bookSpreadReady || bookTurning || bookZoom >= 2.5;
+        resetZoomButton.disabled = !bookSpreadReady || bookTurning || bookZoom === 1;
+        bookLayoutButton.disabled = !bookSpreadReady || bookTurning;
+        bookLayoutButton.textContent = bookSinglePage ? 'Two-page spread' : 'Single page';
+        bookZoomLevel.textContent = `${Math.round(bookZoom * 100)}%`;
+        if (bookSinglePage) {
+          bookStatus.textContent = `Page ${bookStartPage} of ${activeBookDocument.numPages}`;
+        } else {
+          const lastPage = Math.min(bookStartPage + 1, activeBookDocument.numPages);
+          bookStatus.textContent = `Pages ${bookStartPage}–${lastPage} of ${activeBookDocument.numPages}`;
+        }
+      }
+
+      async function renderBookPage(pageNumber, container, generation) {
+        container.replaceChildren();
+        if (pageNumber > activeBookDocument.numPages) {
+          container.appendChild(createElement('span', 'book-page-empty', 'End of book'));
+          return;
+        }
+        const page = await activeBookDocument.getPage(pageNumber);
+        if (generation !== bookRenderGeneration) return;
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(
+          (container.clientWidth - 24) / baseViewport.width,
+          (container.clientHeight - 24) / baseViewport.height
+        );
+        const viewport = page.getViewport({ scale: Math.max(scale, 0.1) * bookZoom });
+        const pixelRatio = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
+        const canvas = document.createElement('canvas');
+        canvas.setAttribute('aria-label', `Page ${pageNumber}`);
+        canvas.width = Math.ceil(viewport.width * pixelRatio);
+        canvas.height = Math.ceil(viewport.height * pixelRatio);
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Canvas rendering is unavailable in this browser.');
+        container.replaceChildren(canvas);
+        try {
+          await page.render({
+            canvasContext: context,
+            viewport,
+            transform: pixelRatio === 1 ? null : [pixelRatio, 0, 0, pixelRatio, 0, 0]
+          }).promise;
+        } catch (error) {
+          if (generation !== bookRenderGeneration && error.name === 'RenderingCancelledException') return;
+          throw error;
+        }
+      }
+
+      async function renderBookSpread() {
+        if (!activeBookDocument) return;
+        const generation = ++bookRenderGeneration;
+        bookSpreadReady = false;
+        updateBookControls();
+        const leftPage = document.getElementById('bookLeftPage');
+        const rightPage = document.getElementById('bookRightPage');
+        if (bookSinglePage) {
+          leftPage.replaceChildren();
+          await renderBookPage(bookStartPage, rightPage, generation);
+        } else {
+          await Promise.all([
+            renderBookPage(bookStartPage, leftPage, generation),
+            renderBookPage(bookStartPage + 1, rightPage, generation)
+          ]);
+        }
+        if (generation === bookRenderGeneration) {
+          bookSpreadReady = true;
+          updateBookControls();
+        }
+      }
+
+      async function openFlipbook(book, trigger) {
+        const openToken = ++bookOpenToken;
+        bookTrigger = trigger;
+        bookGesture = null;
+        bookTurning = false;
+        bookZoom = 1.1;
+        bookSpreadReady = false;
+        document.getElementById('bookTitle').textContent = book.name;
+        bookStatus.textContent = 'Loading PDF…';
+        previousSpreadButton.disabled = true;
+        nextSpreadButton.disabled = true;
+        bookSpread.innerHTML = '<p class="book-loading">Opening your book…</p>';
+        bookViewer.hidden = false;
+        document.body.style.overflow = 'hidden';
+        document.getElementById('closeBookButton').focus();
+        try {
+          const [pdfjs, encoded] = await Promise.all([loadPdfLibrary(), loadBookData(book)]);
+          if (openToken !== bookOpenToken) return;
+          const binary = atob(encoded);
+          const data = new Uint8Array(binary.length);
+          for (let index = 0; index < binary.length; index++) data[index] = binary.charCodeAt(index);
+          const loadingTask = pdfjs.getDocument({ data });
+          const pdfDocument = await loadingTask.promise;
+          if (openToken !== bookOpenToken) {
+            await pdfDocument.destroy();
+            return;
+          }
+          if (activeBookDocument) await activeBookDocument.destroy();
+          activeBookDocument = pdfDocument;
+          bookStartPage = 1;
+          bookSinglePage = false;
+          bookSpread.classList.toggle('single-page', bookSinglePage);
+          bookTurning = false;
+          bookSpreadReady = false;
+          bookSpread.innerHTML = '<div class="book-page" id="bookLeftPage"></div><div class="book-page" id="bookRightPage"></div>';
+          bookSpread.insertAdjacentHTML('beforeend', '<div class="book-hand-hint" aria-hidden="true"><span>👆</span><span>Drag a page to flip</span></div>');
+          await new Promise(resolve => requestAnimationFrame(resolve));
+          await renderBookSpread();
+        } catch (error) {
+          if (openToken === bookOpenToken) showBookError(error);
+        }
+      }
+
+      function closeFlipbook() {
+        bookOpenToken++;
+        bookRenderGeneration++;
+        bookViewer.hidden = true;
+        document.body.style.overflow = '';
+        bookTurning = false;
+        bookSpreadReady = false;
+        bookGesture = null;
+        bookSpread.querySelector('.book-flip-sheet')?.remove();
+        bookSpread.classList.remove('is-dragging');
+        bookSpread.classList.remove('turn-next', 'turn-previous');
+        if (activeBookDocument) {
+          const pdfDocument = activeBookDocument;
+          activeBookDocument = null;
+          pdfDocument.destroy().catch(error => {
+            console.error('Could not close the PDF reader cleanly.', error);
+          });
+        }
+        if (bookTrigger && bookTrigger.isConnected) bookTrigger.focus();
+      }
+
+      function turnBookSpread(direction) {
+        const pageStep = bookSinglePage ? 1 : 2;
+        if (!activeBookDocument || !bookSpreadReady || bookTurning ||
+            (direction < 0 && bookStartPage <= 1) ||
+            (direction > 0 && bookStartPage + pageStep > activeBookDocument.numPages)) return;
+        bookSpread.classList.add('has-interacted');
+        const pageElement = document.getElementById(bookSinglePage ? 'bookRightPage' : (direction > 0 ? 'bookRightPage' : 'bookLeftPage'));
+        if (!pageElement) return;
+        const gesture = startBookTurn(direction, pageElement);
+        finishBookDrag(gesture, true).catch(showBookError);
+      }
+
+      document.getElementById('closeBookButton').addEventListener('click', closeFlipbook);
+      previousSpreadButton.addEventListener('click', () => turnBookSpread(-1));
+      nextSpreadButton.addEventListener('click', () => turnBookSpread(1));
+      bookLayoutButton.addEventListener('click', () => {
+        if (!activeBookDocument || !bookSpreadReady || bookTurning) return;
+        if (!bookSinglePage) {
+          bookSinglePage = true;
+        } else {
+          bookSinglePage = false;
+          if (bookStartPage % 2 === 0) bookStartPage--;
+        }
+        bookSpread.classList.toggle('single-page', bookSinglePage);
+        renderBookSpread().catch(showBookError);
+      });
+      function setBookZoom(zoom) {
+        if (!activeBookDocument || !bookSpreadReady || bookTurning) return;
+        const nextZoom = Math.max(1, Math.min(2.5, Math.round(zoom * 100) / 100));
+        if (nextZoom === bookZoom) return;
+        bookZoom = nextZoom;
+        renderBookSpread().catch(showBookError);
+      }
+      zoomOutButton.addEventListener('click', () => setBookZoom(bookZoom - .1));
+      zoomInButton.addEventListener('click', () => setBookZoom(bookZoom + .1));
+      resetZoomButton.addEventListener('click', () => setBookZoom(1));
+      function copyBookPageCanvas(pageNumber) {
+        const source = Array.from(bookSpread.querySelectorAll('.book-page canvas'))
+          .find(canvas => canvas.getAttribute('aria-label') === `Page ${pageNumber}`);
+        if (!source) return null;
+        const copy = document.createElement('canvas');
+        copy.width = source.width;
+        copy.height = source.height;
+        const context = copy.getContext('2d');
+        if (!context) return null;
+        context.drawImage(source, 0, 0);
+        return copy;
+      }
+
+      function startBookTurn(direction, pageElement, startX = 0, startY = 0, pointerId = null) {
+        const pageStep = bookSinglePage ? 1 : 2;
+        const pageNumber = direction > 0 && !bookSinglePage ? bookStartPage + 1 : bookStartPage;
+        const sheet = document.createElement('div');
+        sheet.className = `book-flip-sheet ${direction > 0 ? 'book-flip-next' : 'book-flip-previous'}`;
+        const front = document.createElement('div');
+        front.className = 'book-flip-face book-flip-front';
+        const back = document.createElement('div');
+        back.className = 'book-flip-face book-flip-back';
+        const currentCanvas = copyBookPageCanvas(pageNumber);
+        if (currentCanvas) front.appendChild(currentCanvas);
+        else front.appendChild(createElement('span', 'book-page-empty', 'Page unavailable'));
+        sheet.append(front, back);
+        bookSpread.appendChild(sheet);
+        const bounds = pageElement.getBoundingClientRect();
+        const gesture = {
+          pointerId,
+          startX,
+          startY,
+          width: bounds.width,
+          height: bounds.height,
+          direction,
+          progress: 0,
+          sheet,
+          backReady: renderBookPage(bookStartPage + direction * pageStep, back, bookRenderGeneration)
+        };
+        sheet.style.setProperty('--book-curl-x', direction > 0 ? '92%' : '0%');
+        sheet.style.setProperty('--book-curl-opacity', '.2');
+        bookGesture = gesture;
+        bookTurning = true;
+        bookSpread.classList.toggle('is-dragging', pointerId !== null);
+        updateBookControls();
+        return gesture;
+      }
+
+      function updateBookDrag(gesture, clientX, clientY) {
+        if (bookGesture !== gesture) return;
+        const distance = clientX - gesture.startX;
+        const progress = Math.max(0, Math.min(1, gesture.direction > 0 ? -distance / gesture.width : distance / gesture.width));
+        const verticalProgress = (clientY - gesture.startY) / gesture.height;
+        const verticalTilt = Math.max(-8, Math.min(8, verticalProgress * 14));
+        gesture.progress = progress;
+        const angle = 180 * Math.sin(progress * Math.PI / 2);
+        const curlLift = Math.sin(progress * Math.PI);
+        const curlPosition = gesture.direction > 0 ? (1 - progress) * 92 : progress * 92;
+        gesture.sheet.style.setProperty('--book-curl-x', `${curlPosition}%`);
+        gesture.sheet.style.setProperty('--book-curl-opacity', `${Math.min(1, .2 + curlLift)}`);
+        gesture.sheet.style.transform = `translateZ(${Math.round(curlLift * 22)}px) rotateX(${verticalTilt}deg) rotateY(${gesture.direction > 0 ? -angle : angle}deg)`;
+        gesture.sheet.style.filter = `drop-shadow(${gesture.direction > 0 ? '' : '-'}${Math.round(progress * 16)}px 0 ${Math.round(progress * 22)}px #11182766)`;
+      }
+
+      async function finishBookDrag(gesture, shouldFlip) {
+        if (bookGesture !== gesture) return;
+        await gesture.backReady;
+        if (bookGesture !== gesture) return;
+        if (!shouldFlip) {
+          gesture.sheet.style.transition = 'transform .2s ease, filter .2s ease, --book-curl-x .2s ease, --book-curl-opacity .2s ease';
+          gesture.sheet.style.transform = '';
+          gesture.sheet.style.filter = '';
+          gesture.sheet.style.setProperty('--book-curl-x', gesture.direction > 0 ? '92%' : '0%');
+          gesture.sheet.style.setProperty('--book-curl-opacity', '.2');
+          window.setTimeout(() => {
+            gesture.sheet.remove();
+            bookSpread.classList.remove('is-dragging');
+            if (bookGesture === gesture) {
+              bookGesture = null;
+              bookTurning = false;
+              updateBookControls();
+            }
+          }, 220);
+          return;
+        }
+        const turnDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 600;
+        const turnSeconds = `${turnDuration / 1000}s`;
+        gesture.sheet.style.transition = `transform ${turnSeconds} cubic-bezier(.45,.05,.55,.95), filter ${turnSeconds} ease, --book-curl-x ${turnSeconds} ease, --book-curl-opacity ${turnSeconds} ease`;
+        gesture.sheet.style.transform = `rotateY(${gesture.direction > 0 ? -180 : 180}deg)`;
+        gesture.sheet.style.filter = 'drop-shadow(0 8px 18px #11182755)';
+        gesture.sheet.style.setProperty('--book-curl-x', gesture.direction > 0 ? '0%' : '92%');
+        gesture.sheet.style.setProperty('--book-curl-opacity', '.85');
+        window.setTimeout(async () => {
+          if (bookGesture !== gesture) return;
+          bookStartPage += gesture.direction * (bookSinglePage ? 1 : 2);
+          gesture.sheet.remove();
+          bookSpread.classList.remove('is-dragging');
+          bookGesture = null;
+          try {
+            await renderBookSpread();
+          } catch (error) {
+            showBookError(error);
+          } finally {
+            bookTurning = false;
+            updateBookControls();
+          }
+        }, turnDuration + 10);
+      }
+
+      bookSpread.addEventListener('pointerdown', event => {
+        if (!activeBookDocument || !bookSpreadReady || bookTurning || event.button !== 0) return;
+        const pageElement = event.target.closest('.book-page');
+        if (!pageElement) return;
+        let direction;
+        if (bookSinglePage) {
+          const bounds = pageElement.getBoundingClientRect();
+          direction = event.clientX < bounds.left + bounds.width / 2 ? -1 : 1;
+        } else {
+          direction = pageElement.id === 'bookRightPage' ? 1 : -1;
+        }
+        const pageStep = bookSinglePage ? 1 : 2;
+        if ((direction > 0 && bookStartPage + pageStep > activeBookDocument.numPages) ||
+            (direction < 0 && bookStartPage <= 1)) return;
+        bookSpread.classList.add('has-interacted');
+        const gesture = startBookTurn(direction, pageElement, event.clientX, event.clientY, event.pointerId);
+        bookSpread.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+
+      bookSpread.addEventListener('pointermove', event => {
+        if (bookGesture && event.pointerId === bookGesture.pointerId) {
+          updateBookDrag(bookGesture, event.clientX, event.clientY);
+          event.preventDefault();
+        }
+      });
+
+      bookSpread.addEventListener('pointerup', event => {
+        if (!bookGesture || event.pointerId !== bookGesture.pointerId) return;
+        const gesture = bookGesture;
+        updateBookDrag(gesture, event.clientX, event.clientY);
+        const distance = Math.abs(event.clientX - gesture.startX);
+        finishBookDrag(gesture, distance < 10 || gesture.progress >= .22).catch(showBookError);
+      });
+
+      bookSpread.addEventListener('pointercancel', event => {
+        if (!bookGesture || event.pointerId !== bookGesture.pointerId) return;
+        finishBookDrag(bookGesture, false).catch(showBookError);
+      });
+
+      document.addEventListener('keydown', event => {
+        if (bookViewer.hidden) return;
+        if (event.key === 'Escape') closeFlipbook();
+        if (event.key === 'ArrowLeft') turnBookSpread(-1);
+        if (event.key === 'ArrowRight') turnBookSpread(1);
+      });
+
+      document.getElementById('mainNavigation').addEventListener('click', event => {
+        const button = event.target.closest('[data-page]');
+        if (button) setPage(button.dataset.page);
+      });
+      document.getElementById('quickAccess').addEventListener('click', event => {
+        const button = event.target.closest('[data-page]');
+        if (button) setPage(button.dataset.page);
+      });
+      document.querySelectorAll('[data-page]').forEach(button => {
+        if (!button.closest('#mainNavigation') && !button.closest('#quickAccess')) {
+          button.addEventListener('click', () => setPage(button.dataset.page));
+        }
+      });
+
+      function applySearch(query) {
+        const normalized = query.trim().toLowerCase();
+        document.querySelectorAll('.page:not([hidden]) .searchable, .page:not([hidden]) .card, .page:not([hidden]) .quick-card, .page:not([hidden]) .check-list li, .page:not([hidden]) .tech-table tr').forEach(item => {
+          item.hidden = normalized !== '' && !item.textContent.toLowerCase().includes(normalized);
+        });
+      }
+      document.getElementById('searchInput').addEventListener('input', event => applySearch(event.target.value));
+
+      let modules = loadArray(moduleStorageKey);
+      modules = modules.filter(module => module && typeof module.id === 'string' &&
+        typeof module.name === 'string' && Array.isArray(module.submodules) && Array.isArray(module.files));
+      const storedModuleCount = modules.length;
+      let modulesChanged = false;
+      defaultModules.forEach(defaultModule => {
+        if (!modules.some(module => module.id === defaultModule.id)) {
+          modules.push({ ...defaultModule, files: [], submodules: [] });
+          modulesChanged = true;
+        }
+      });
+      const firstModule = modules.find(module => module.id === 'ds-module-1');
+      if (firstModule && ['ppd', 'statistical methods for data science', 'flip notebook'].includes(firstModule.name.trim().toLowerCase())) {
+        firstModule.name = 'Introduction of Data Science';
+        modulesChanged = true;
+      }
+      if (modules.length !== storedModuleCount || modulesChanged) saveArray(moduleStorageKey, modules);
+
+      function renderModules() {
+        const grid = document.getElementById('modulesGrid');
+        grid.replaceChildren();
+        if (!modules.length) {
+          grid.appendChild(createElement('p', 'empty-state', 'No modules yet. Choose Add module to select your first module file.'));
+          return;
+        }
+        modules.forEach(module => {
+          const card = createElement('article', 'card module-card searchable');
+          const top = createElement('div', 'module-top');
+          const info = document.createElement('div');
+          const bundledBooks = modulePdfBooksById[module.id] || [];
+          const fileCount = module.files.length + bundledBooks.length;
+          info.append(createElement('h3', '', module.name), createElement('p', '', `${fileCount} file${fileCount === 1 ? '' : 's'}`));
+          const description = defaultModules.find(item => item.id === module.id)?.description;
+          if (description) info.appendChild(createElement('p', 'module-description', description));
+          top.appendChild(info);
+          const fileButton = createElement('button', 'secondary-btn', '＋ Add file');
+          fileButton.type = 'button';
+          fileButton.dataset.action = 'add-module-file';
+          fileButton.dataset.moduleId = module.id;
+          top.appendChild(fileButton);
+          card.appendChild(top);
+
+          if (module.files.length) {
+            const fileList = createElement('ul', 'module-files');
+            module.files.forEach(file => {
+              const item = document.createElement('li');
+              const link = createElement('a', '', file.name);
+              link.href = file.data;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+              link.download = file.name;
+              item.appendChild(link);
+              fileList.appendChild(item);
+            });
+            card.appendChild(fileList);
+          }
+          if (bundledBooks.length) {
+            const bookList = createElement('ul', 'module-book-list');
+            bundledBooks.forEach(book => {
+              const item = document.createElement('li');
+              const link = createElement('a', 'module-book-name', book.name);
+              link.href = book.file;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+              link.title = 'Open the PDF in your browser';
+              const openButton = createElement('button', 'secondary-btn', 'Read flipbook');
+              openButton.type = 'button';
+              openButton.dataset.openBook = book.name;
+              item.append(link, openButton);
+              bookList.appendChild(item);
+            });
+            card.appendChild(bookList);
+          }
+
+          const submoduleBox = createElement('div', 'submodule-box');
+          submoduleBox.appendChild(createElement('h4', '', 'Submodules'));
+          const submoduleList = createElement('ul', 'submodule-list');
+          if (module.submodules.length) {
+            module.submodules.forEach(name => submoduleList.appendChild(createElement('li', '', name)));
+          } else {
+            submoduleList.appendChild(createElement('li', '', 'No submodules yet.'));
+          }
+          submoduleBox.appendChild(submoduleList);
+          const form = createElement('form', 'submodule-form');
+          form.dataset.moduleId = module.id;
+          const input = document.createElement('input');
+          input.name = 'submodule';
+          input.placeholder = 'Submodule name';
+          input.setAttribute('aria-label', `Submodule name for ${module.name}`);
+          input.required = true;
+          const submit = createElement('button', 'secondary-btn', '＋ Add submodule');
+          submit.type = 'submit';
+          form.append(input, submit);
+          submoduleBox.appendChild(form);
+          card.append(top, submoduleBox);
+          grid.appendChild(card);
+        });
+        applySearch(document.getElementById('searchInput').value);
+      }
+
+      const moduleFileInput = document.getElementById('moduleFileInput');
+      let selectedModuleId = null;
+      document.getElementById('addModuleButton').addEventListener('click', () => {
+        selectedModuleId = null;
+        moduleFileInput.click();
+      });
+      document.getElementById('modulesGrid').addEventListener('click', event => {
+        const bookButton = event.target.closest('[data-open-book]');
+        if (bookButton) {
+          const book = Object.values(modulePdfBooksById).flat().find(item => item.name === bookButton.dataset.openBook);
+          if (book) openFlipbook(book, bookButton);
+          return;
+        }
+        const button = event.target.closest('[data-action="add-module-file"]');
+        if (!button) return;
+        selectedModuleId = button.dataset.moduleId;
+        moduleFileInput.click();
+      });
+      moduleFileInput.addEventListener('change', async () => {
+        const files = Array.from(moduleFileInput.files || []);
+        moduleFileInput.value = '';
+        if (!files.length) return;
+        for (const file of files) {
+          if (file.size > 1500000) {
+            showNotice(`${file.name} is larger than 1.5 MB and was skipped.`);
+            continue;
+          }
+          try {
+            const data = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.addEventListener('load', () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Unexpected file data.')));
+              reader.addEventListener('error', () => reject(reader.error || new Error('Could not read file.')));
+              reader.readAsDataURL(file);
+            });
+            const existing = selectedModuleId && modules.find(module => module.id === selectedModuleId);
+            if (existing) {
+              existing.files.push({ name: file.name, data });
+            } else {
+              modules.push({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, name: file.name, files: [{ name: file.name, data }], submodules: [] });
+            }
+            if (!saveArray(moduleStorageKey, modules)) {
+              if (existing) existing.files.pop();
+              else modules.pop();
+              renderModules();
+              return;
+            }
+          } catch (error) {
+            console.error('Could not read module file.', error);
+            showNotice(`Could not read ${file.name}.`);
+          }
+        }
+        renderModules();
+        showNotice('Module file added.');
+      });
+      document.getElementById('modulesGrid').addEventListener('submit', event => {
+        const form = event.target.closest('.submodule-form');
+        if (!form) return;
+        event.preventDefault();
+        const module = modules.find(item => item.id === form.dataset.moduleId);
+        const input = form.elements.submodule;
+        const name = input.value.trim();
+        if (!module || !name) return;
+        module.submodules.push(name);
+        if (!saveArray(moduleStorageKey, modules)) {
+          module.submodules.pop();
+          return;
+        }
+        renderModules();
+        showNotice('Submodule added.');
+      });
+
+      let projects = loadArray(projectStorageKey).filter(project =>
+        project && typeof project.id === 'string' && typeof project.title === 'string' &&
+        typeof project.github === 'string' && typeof project.module === 'string'
+      );
+      function renderProjects() {
+        const list = document.getElementById('projectList');
+        list.replaceChildren();
+        if (!projects.length) {
+          list.appendChild(createElement('p', 'empty-state empty-projects', 'No projects yet. Add your first project and GitHub repository above.'));
+          return;
+        }
+        projects.forEach(project => {
+          const card = createElement('article', 'card project-card searchable');
+          card.append(createElement('span', 'eyebrow', project.module), createElement('h3', '', project.title));
+          if (project.description) card.appendChild(createElement('p', '', project.description));
+          const link = createElement('a', 'project-link', 'Open GitHub repository ↗');
+          link.href = project.github;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          card.appendChild(link);
+          const remove = createElement('button', 'secondary-btn', 'Remove project');
+          remove.type = 'button';
+          remove.dataset.removeProject = project.id;
+          card.appendChild(remove);
+          list.appendChild(card);
+        });
+        applySearch(document.getElementById('searchInput').value);
+      }
+      document.getElementById('projectForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const values = new FormData(form);
+        let github;
+        try {
+          github = new URL(String(values.get('github')).trim());
+        } catch (error) {
+          showNotice('Enter a valid GitHub repository URL.');
+          return;
+        }
+        if (github.protocol !== 'https:' || github.hostname.toLowerCase() !== 'github.com' ||
+            github.username || github.password || github.pathname.split('/').filter(Boolean).length < 2) {
+          showNotice('Use an HTTPS GitHub repository link, such as https://github.com/username/repository.');
+          return;
+        }
+        const project = {
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          title: String(values.get('title')).trim(),
+          description: String(values.get('description')).trim(),
+          module: String(values.get('module')),
+          github: github.href
+        };
+        projects.push(project);
+        if (!saveArray(projectStorageKey, projects)) {
+          projects.pop();
+          return;
+        }
+        form.reset();
+        renderProjects();
+        showNotice('Project added.');
+      });
+      document.getElementById('projectList').addEventListener('click', event => {
+        const button = event.target.closest('[data-remove-project]');
+        if (!button) return;
+        const index = projects.findIndex(project => project.id === button.dataset.removeProject);
+        if (index < 0) return;
+        const [removed] = projects.splice(index, 1);
+        if (!saveArray(projectStorageKey, projects)) {
+          projects.splice(index, 0, removed);
+          return;
+        }
+        renderProjects();
+        showNotice('Project removed.');
+      });
+
+      const studyGuidance = [
+        { terms: ['linear regression', 'regression'], answer: 'Linear regression predicts a numeric target by fitting a line (or hyperplane) to input features. Review the slope and intercept, then evaluate predictions with MAE, RMSE, and residual plots.' },
+        { terms: ['python', 'pandas', 'numpy'], answer: 'For a Python data workflow, load data into pandas, inspect shape and dtypes, handle missing values, and use NumPy/pandas transformations. Finish with a clear Matplotlib or Seaborn visualization.' },
+        { terms: ['statistics', 'probability', 'hypothesis'], answer: 'Start by defining the population, sample, and variable types. Summarize data with distributions and confidence intervals, then state a null hypothesis and interpret the p-value in context.' },
+        { terms: ['machine learning', 'classification', 'clustering'], answer: 'Define the prediction goal first. Split training and test data before fitting, build a simple baseline, choose metrics that match the task, and compare models without leaking test data.' },
+        { terms: ['data mining', 'warehouse', 'mining'], answer: 'Data mining extracts useful patterns from prepared data. Review cleaning and feature selection, then compare classification, clustering, and association-rule methods against a specific question.' },
+        { terms: ['big data', 'hadoop', 'spark'], answer: 'Big data systems distribute storage and computation across machines. Learn the MapReduce idea, partitioning, fault tolerance, and when a tool such as Apache Spark is a good fit.' }
+      ];
+      document.getElementById('assistantForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const question = document.getElementById('assistantQuestion').value.trim().toLowerCase();
+        const match = studyGuidance.find(topic => topic.terms.some(term => question.includes(term)));
+        document.getElementById('assistantResponse').textContent = match
+          ? match.answer
+          : 'I can help you get started with statistics, Python/pandas, regression, machine learning, data mining, and big data. Try asking about one of those topics.';
+      });
+
+      let areaFiles = loadArray(areaStorageKey);
+      function renderAreaFiles(pageId) {
+        const details = areaDetails[pageId];
+        if (!details) return;
+        document.getElementById('toolDirectory').hidden = pageId !== 'tools';
+        document.getElementById('genericTitle').textContent = details[0];
+        document.getElementById('genericDescription').textContent = details[1];
+        document.getElementById('areaHeading').textContent = `${details[0]} files`;
+        const list = document.getElementById('areaFileList');
+        list.replaceChildren();
+        const matching = areaFiles.filter(file => file.page === pageId ||
+          (pageId === 'study' && file.page === 'resources') ||
+          (pageId === 'resources' && ['study', 'references', 'learning'].includes(file.page)));
+        if (!matching.length) {
+          list.appendChild(createElement('li', 'empty-state', 'No files added yet.'));
+          return;
+        }
+        matching.forEach(file => {
+          const item = document.createElement('li');
+          const link = createElement('a', '', file.name);
+          link.href = file.data;
+          link.download = file.name;
+          item.appendChild(link);
+          list.appendChild(item);
+        });
+      }
+      function renderLabFiles() {
+        const list = document.getElementById('labFileList');
+        list.replaceChildren();
+        const matching = areaFiles.filter(file => file.page === 'lab');
+        if (!matching.length) {
+          list.appendChild(createElement('li', 'empty-state', 'No lab files added yet.'));
+          return;
+        }
+        matching.forEach(file => {
+          const item = document.createElement('li');
+          const link = createElement('a', '', file.name);
+          link.href = file.data;
+          link.download = file.name;
+          item.appendChild(link);
+          list.appendChild(item);
+        });
+      }
+      document.getElementById('labUploadButton').addEventListener('click', () => document.getElementById('labFileInput').click());
+      document.getElementById('labFileInput').addEventListener('change', async event => {
+        const input = event.target;
+        const files = Array.from(input.files || []);
+        input.value = '';
+        for (const file of files) {
+          if (file.size > 1500000) {
+            showNotice(`${file.name} is larger than 1.5 MB and was skipped.`);
+            continue;
+          }
+          try {
+            const data = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.addEventListener('load', () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Unexpected file data.')));
+              reader.addEventListener('error', () => reject(reader.error || new Error('Could not read file.')));
+              reader.readAsDataURL(file);
+            });
+            areaFiles.push({ page: 'lab', name: file.name, data });
+            if (!saveArray(areaStorageKey, areaFiles)) {
+              areaFiles.pop();
+              renderLabFiles();
+              return;
+            }
+          } catch (error) {
+            console.error('Could not read lab file.', error);
+            showNotice(`Could not read ${file.name}.`);
+          }
+        }
+        renderLabFiles();
+        showNotice('Lab files added.');
+      });
+      document.getElementById('uploadAreaButton').addEventListener('click', () => document.getElementById('areaFileInput').click());
+      document.getElementById('areaFileInput').addEventListener('change', async event => {
+        const input = event.target;
+        const pageId = document.querySelector('.nav-button.active')?.dataset.page;
+        const files = Array.from(input.files || []);
+        input.value = '';
+        if (!pageId || !areaDetails[pageId]) return;
+        for (const file of files) {
+          if (file.size > 1500000) {
+            showNotice(`${file.name} is larger than 1.5 MB and was skipped.`);
+            continue;
+          }
+          try {
+            const data = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.addEventListener('load', () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Unexpected file data.')));
+              reader.addEventListener('error', () => reject(reader.error || new Error('Could not read file.')));
+              reader.readAsDataURL(file);
+            });
+            areaFiles.push({ page: pageId, name: file.name, data });
+            if (!saveArray(areaStorageKey, areaFiles)) {
+              areaFiles.pop();
+              renderAreaFiles(pageId);
+              return;
+            }
+          } catch (error) {
+            console.error('Could not read learning material.', error);
+            showNotice(`Could not read ${file.name}.`);
+          }
+        }
+        renderAreaFiles(pageId);
+        showNotice('Files added.');
+      });
+
+      renderProfile();
+      renderModules();
+      renderProjects();
+      renderLabFiles();
+    })();
+  </script>
+</body>
+</html>
