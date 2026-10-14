@@ -238,11 +238,6 @@
     @media (prefers-reduced-motion: reduce) {
       .book-hand-hint span:first-child { animation: none; }
     }
-    .submodule-box { padding-top: 11px; border-top: 1px solid var(--line); }
-    .submodule-box h4 { margin: 0 0 6px; color: var(--navy); font-size: 13px; }
-    .submodule-list { margin: 0 0 10px 18px; padding: 0; color: var(--muted); }
-    .submodule-form { display: flex; flex-wrap: wrap; gap: 7px; }
-    .submodule-form input { flex: 1; min-width: 120px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
     .file-input { display: none; }
     .upload-list { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
     .upload-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; }
@@ -512,7 +507,7 @@
             <article class="card"><span class="step-number">8</span><h3>Faculty Information</h3><p>A separate faculty card displays BosuBabu and the designation Assistant Professor.</p></article>
             <article class="card"><span class="step-number">9</span><h3>Academic Profile</h3><p>The dashboard link opens a dedicated academic profile page with student, course, faculty, university, resume, and GitHub details.</p></article>
             <article class="card"><span class="step-number">10</span><h3>Module Management</h3><p>Module 1 includes five bundled PDFs that open in an offline two-page flipbook. Tap a page or drag it across the book to turn pages; keyboard and navigation controls are also available.</p></article>
-            <article class="card"><span class="step-number">11</span><h3>Testing</h3><p>Verify navigation, page search, module uploads, submodule entry, links, images, and responsive layouts before presenting the site.</p></article>
+            <article class="card"><span class="step-number">11</span><h3>Testing</h3><p>Verify navigation, page search, module uploads, links, images, and responsive layouts before presenting the site.</p></article>
           </div>
           <div class="section-heading"><div><h3>Technologies in this implementation</h3><p>This project is a static, browser-based website.</p></div></div>
           <article class="card">
@@ -531,7 +526,7 @@
           <div class="section-heading"><div><h3>Before presenting</h3><p>Run through these checks in the browser.</p></div></div>
           <ul class="check-list">
             <li>Open each navigation item and all six quick-access cards.</li><li>Search for a visible item on the current page.</li>
-            <li>Add a module file and check its link.</li><li>Add a submodule and refresh to confirm it is saved.</li>
+            <li>Add a module file and check its link.</li>
             <li>Open each Module 1 PDF, tap or drag a page to turn it, and confirm both pages in each spread.</li>
             <li>Upload a file to each learning area and confirm it persists after refresh.</li>
             <li>Open the academic profile link and confirm its links work.</li>
@@ -1240,27 +1235,7 @@
             card.appendChild(bookList);
           }
 
-          const submoduleBox = createElement('div', 'submodule-box');
-          submoduleBox.appendChild(createElement('h4', '', 'Submodules'));
-          const submoduleList = createElement('ul', 'submodule-list');
-          if (module.submodules.length) {
-            module.submodules.forEach(name => submoduleList.appendChild(createElement('li', '', name)));
-          } else {
-            submoduleList.appendChild(createElement('li', '', 'No submodules yet.'));
-          }
-          submoduleBox.appendChild(submoduleList);
-          const form = createElement('form', 'submodule-form');
-          form.dataset.moduleId = module.id;
-          const input = document.createElement('input');
-          input.name = 'submodule';
-          input.placeholder = 'Submodule name';
-          input.setAttribute('aria-label', `Submodule name for ${module.name}`);
-          input.required = true;
-          const submit = createElement('button', 'secondary-btn', '＋ Add submodule');
-          submit.type = 'submit';
-          form.append(input, submit);
-          submoduleBox.appendChild(form);
-          card.append(top, submoduleBox);
+          card.appendChild(top);
           grid.appendChild(card);
         });
         applySearch(document.getElementById('searchInput').value);
@@ -1320,23 +1295,6 @@
         renderModules();
         showNotice('Module file added.');
       });
-      document.getElementById('modulesGrid').addEventListener('submit', event => {
-        const form = event.target.closest('.submodule-form');
-        if (!form) return;
-        event.preventDefault();
-        const module = modules.find(item => item.id === form.dataset.moduleId);
-        const input = form.elements.submodule;
-        const name = input.value.trim();
-        if (!module || !name) return;
-        module.submodules.push(name);
-        if (!saveArray(moduleStorageKey, modules)) {
-          module.submodules.pop();
-          return;
-        }
-        renderModules();
-        showNotice('Submodule added.');
-      });
-
       let projects = loadArray(projectStorageKey).filter(project =>
         project && typeof project.id === 'string' && typeof project.title === 'string' &&
         typeof project.github === 'string' && typeof project.module === 'string'
