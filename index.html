@@ -457,7 +457,7 @@
             <h3>Add a project</h3>
             <div class="form-grid">
               <div class="form-field"><label for="projectName">Project title</label><input id="projectName" name="title" maxlength="100" placeholder="e.g. Exploratory Data Analysis" required></div>
-              <div class="form-field"><label for="projectModule">Module</label><select id="projectModule" name="module"><option>Statistical Methods for Data Science</option><option>Python Programming for Data Science</option><option>Data Warehousing and Data Mining</option><option>Machine Learning</option><option>Big Data Analytics</option></select></div>
+              <div class="form-field"><label for="projectModule">Module</label><select id="projectModule" name="module"><option>Introduction of Data Science</option><option>Data extraction</option><option>Data Warehousing and Data Mining</option><option>Machine Learning</option><option>Big Data Analytics</option></select></div>
               <div class="form-field full"><label for="projectDescription">Short description</label><textarea id="projectDescription" name="description" maxlength="300" placeholder="What did you build or investigate?"></textarea></div>
               <div class="form-field full"><label for="projectGithub">GitHub repository URL</label><input id="projectGithub" name="github" type="url" placeholder="https://github.com/username/repository" required></div>
             </div>
@@ -588,7 +588,7 @@
       };
       const defaultModules = [
         { id: 'ds-module-1', name: 'Introduction of Data Science', description: 'Open your course PDFs as a two-page textbook and flip through each spread.' },
-        { id: 'ds-module-2', name: 'Python Programming for Data Science', description: 'Python fundamentals, NumPy, pandas, data cleaning, visualization, and data analytics materials.' },
+        { id: 'ds-module-2', name: 'Data extraction', description: 'Course PDFs covering data extraction, collection, processing, and analytics.' },
         { id: 'ds-module-3', name: 'Data Warehousing and Data Mining', description: 'Data preparation, warehousing concepts, mining methods, and pattern discovery.' },
         { id: 'ds-module-4', name: 'Machine Learning', description: 'Supervised and unsupervised learning, model evaluation, and practical workflows.' },
         { id: 'ds-module-5', name: 'Big Data Analytics', description: 'Distributed data processing, scalable analytics, and big data ecosystems.' }
@@ -1161,6 +1161,11 @@
           modulesChanged = true;
         }
       });
+      const secondModule = modules.find(module => module.id === 'ds-module-2');
+      if (secondModule && secondModule.name.trim().toLowerCase() !== 'data extraction') {
+        secondModule.name = 'Data extraction';
+        modulesChanged = true;
+      }
       const firstModule = modules.find(module => module.id === 'ds-module-1');
       if (firstModule && ['ppd', 'statistical methods for data science', 'flip notebook'].includes(firstModule.name.trim().toLowerCase())) {
         firstModule.name = 'Introduction of Data Science';
