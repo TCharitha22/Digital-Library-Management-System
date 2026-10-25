@@ -450,10 +450,10 @@
         </section>
 
         <section class="page" id="page-lab" hidden>
-          <div class="section-heading"><div><h2>Lab Experiments</h2><p>Download the course program documents included with this site. Files you add below are saved in this browser only.</p></div></div>
+          <div class="section-heading"><div><h2>Lab Experiments</h2><p>Browse the shared course documents. Any extra files you add are saved in this browser only.</p></div></div>
           <div class="section-heading"><div><h3>Core lab program list</h3><p>Checklist of the experiments included in your Data Science lab work.</p></div></div>
           <div class="card-grid lab-experiment-grid" id="labExperimentGrid"></div>
-          <div class="section-heading"><div><h3>Experiment files and reports</h3><p>Keep your lab work together in this browser.</p></div><button class="primary-btn" id="labUploadButton" type="button">＋ Add lab files</button></div>
+          <div class="section-heading"><div><h3>Experiment files and reports</h3><p>Shared program files are available to everyone; your added files stay in this browser.</p></div><button class="primary-btn" id="labUploadButton" type="button">＋ Add lab files</button></div>
           <input class="file-input" id="labFileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp" multiple>
           <article class="card"><ul class="upload-list" id="labFileList"></ul></article>
         </section>
@@ -1428,10 +1428,19 @@
           list.appendChild(item);
         });
       }
+      const sharedLabFiles = [
+        { name: 'DS_Program6.docx', data: 'assets/lab-experiments/DS_Program6.docx' },
+        { name: 'DS_Program7.docx', data: 'assets/lab-experiments/DS_Program7.docx' },
+        { name: 'DS_Program8.docx', data: 'assets/lab-experiments/DS_Program8.docx' }
+      ];
+
       function renderLabFiles() {
         const list = document.getElementById('labFileList');
         list.replaceChildren();
-        const matching = areaFiles.filter(file => file.page === 'lab');
+        const matching = [
+          ...sharedLabFiles,
+          ...areaFiles.filter(file => file.page === 'lab')
+        ];
         if (!matching.length) {
           list.appendChild(createElement('li', 'empty-state', 'No lab files added yet.'));
           return;
