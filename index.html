@@ -132,6 +132,12 @@
     }
     .card h3 { margin: 0 0 6px; color: var(--navy); font-size: 17px; }
     .card p { margin: 0; color: var(--muted); }
+    .lab-experiment-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+    .lab-experiment-card { display: grid; gap: 12px; min-height: 100%; }
+    .lab-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+    .lab-tag { display: inline-flex; align-items: center; padding: 4px 8px; border: 1px solid var(--purple-border); border-radius: 99px; color: var(--purple); background: var(--purple-light); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .lab-objectives { margin: 0; padding-left: 18px; color: var(--ink); }
+    .lab-objectives li { margin-bottom: 5px; }
     .quick-card { display: flex; min-height: 134px; flex-direction: column; align-items: flex-start; justify-content: space-between; border: 1px solid var(--line); border-radius: 15px; padding: 17px; color: var(--ink); background: #fff; text-align: left; }
     .quick-card:hover { border-color: #9a7be8; transform: translateY(-2px); }
     .quick-card strong { color: var(--navy); font-size: 16px; }
@@ -392,7 +398,7 @@
                     <div><dt>Lecturer</dt><dd id="profileLecturer">BosuBabu · Assistant Professor</dd></div>
                     <div><dt>University</dt><dd id="profileUniversity">Mohan Babu University</dd></div>
                   </dl>
-                  <div class="profile-actions"><button class="secondary-btn" type="button" data-page="profile">View My Academic Profile →</button></div>
+                  <div class="profile-actions"><button class="secondary-btn" type="button" data-page="profile">View My Academic Profile →</button><a class="github-link" href="https://github.com/TCharitha22" target="_blank" rel="noopener noreferrer">Open GitHub profile ↗</a><a class="resume-link" href="assets/charitha-resume.pdf">View Resume ↗</a></div>
                 </div>
               </div>
               </article>
@@ -430,6 +436,10 @@
               <div class="profile-detail"><small>Faculty</small><strong id="academicProfileLecturer">BosuBabu · Assistant Professor</strong></div>
               <div class="profile-detail"><small>University</small><strong id="academicProfileUniversity">Mohan Babu University</strong></div>
             </div>
+            <div class="profile-actions">
+              <a class="github-link" href="https://github.com/TCharitha22" target="_blank" rel="noopener noreferrer">Open GitHub profile ↗</a>
+              <a class="resume-link" href="assets/charitha-resume.pdf">View Resume ↗</a>
+            </div>
           </article>
         </section>
 
@@ -440,7 +450,9 @@
         </section>
 
         <section class="page" id="page-lab" hidden>
-          <div class="section-heading"><div><h2>Lab Experiments</h2><p>Upload and organize experiment instructions, practical reports, and supporting files.</p></div></div>
+          <div class="section-heading"><div><h2>Lab Experiments</h2><p>Download the course program documents included with this site. Files you add below are saved in this browser only.</p></div></div>
+          <div class="section-heading"><div><h3>Core lab program list</h3><p>Checklist of the experiments included in your Data Science lab work.</p></div></div>
+          <div class="card-grid lab-experiment-grid" id="labExperimentGrid"></div>
           <div class="section-heading"><div><h3>Experiment files and reports</h3><p>Keep your lab work together in this browser.</p></div><button class="primary-btn" id="labUploadButton" type="button">＋ Add lab files</button></div>
           <input class="file-input" id="labFileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp" multiple>
           <article class="card"><ul class="upload-list" id="labFileList"></ul></article>
@@ -664,6 +676,10 @@
       }
 
       let studentProfile = readProfile();
+      if (studentProfile.name.trim().toLowerCase() === 'tullimilli charitha naga sai kavya') {
+        studentProfile.name = defaultProfile.name;
+        saveProfile(studentProfile);
+      }
       function renderProfile() {
         document.getElementById('profileName').textContent = studentProfile.name;
         document.getElementById('profileRegisterNo').textContent = studentProfile.registerNo;
@@ -1494,9 +1510,72 @@
         showNotice('Files added.');
       });
 
+      const labExperiments = [
+        {
+          title: 'Time Series Analysis',
+          code: 'Program 6',
+          file: 'assets/lab-experiments/DS_Program6.docx',
+          fileName: 'DS_Program6.docx',
+          objective: 'Create time series using pandas datetime objects and analyze timestamps, time zones, and resampling.',
+          outcomes: [
+            'Create time series using datetime objects and timestamps as the index.',
+            'Use pandas.date_range, period_range, and timezone conversion methods.',
+            'Perform resampling and period arithmetic for time series analysis.'
+          ]
+        },
+        {
+          title: 'Data Aggregation and Groupby',
+          code: 'Program 7',
+          file: 'assets/lab-experiments/DS_Program7.docx',
+          fileName: 'DS_Program7.docx',
+          objective: 'Use groupby and aggregation to summarize tabular data across single and multiple keys.',
+          outcomes: [
+            'Create tabular data and group it by one or more columns.',
+            'Compute aggregate statistics like sum, mean, and standard deviation.',
+            'Perform exploratory analysis using grouped datasets.'
+          ]
+        },
+        {
+          title: 'Web Scraping and Sentiment Analysis',
+          code: 'Program 8',
+          file: 'assets/lab-experiments/DS_Program8.docx',
+          fileName: 'DS_Program8.docx',
+          objective: 'Extract product reviews, analyze text, and build sentiment-based visualizations using Beautiful Soup and NLP tools.',
+          outcomes: [
+            'Scrape review data from an authorized HTML source and save the dataset.',
+            'Use Beautiful Soup for extraction and text preprocessing.',
+            'Generate WordClouds, charts, and sentiment scores with NLTK/VADER.'
+          ]
+        }
+      ];
+
+      function renderLabExperiments() {
+        const grid = document.getElementById('labExperimentGrid');
+        if (!grid) return;
+        grid.replaceChildren();
+        labExperiments.forEach(experiment => {
+          const card = createElement('article', 'card lab-experiment-card searchable');
+          const header = createElement('div', '');
+          const title = createElement('h3', '', experiment.title);
+          const meta = createElement('div', 'lab-meta');
+          meta.appendChild(createElement('span', 'lab-tag', experiment.code));
+          if (experiment.objective) meta.appendChild(createElement('span', 'lab-tag', 'Practical'));
+          header.append(title, meta);
+          const objective = createElement('p', '', experiment.objective);
+          const list = createElement('ul', 'lab-objectives');
+          experiment.outcomes.forEach(item => list.appendChild(createElement('li', '', item)));
+          const download = createElement('a', 'secondary-btn', `Download ${experiment.code} document`);
+          download.href = experiment.file;
+          download.download = experiment.fileName;
+          card.append(header, objective, list, download);
+          grid.appendChild(card);
+        });
+      }
+
       renderProfile();
       renderModules();
       renderProjects();
+      renderLabExperiments();
       renderLabFiles();
     })();
   </script>
